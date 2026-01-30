@@ -48,6 +48,13 @@ export const apiFindGithubBranches = z.object({
 	githubId: z.string().optional(),
 });
 
+export const apiFindGithubPullRequests = z.object({
+	repo: z.string().min(1),
+	owner: z.string().min(1),
+	githubId: z.string().min(1),
+	state: z.enum(["open", "closed", "all"]).optional().default("open"),
+});
+
 export const apiFindOneGithub = createSchema
 	.extend({
 		githubId: z.string().min(1),
