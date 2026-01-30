@@ -357,6 +357,7 @@ export const ShowPreviewSettings = ({ applicationId }: Props) => {
 												<div className="flex gap-2">
 													<FormControl>
 														<Input
+															id="pr-number-input"
 															type="number"
 															placeholder="Enter PR number (e.g. 123)"
 															onKeyDown={(e) => {
@@ -380,10 +381,10 @@ export const ShowPreviewSettings = ({ applicationId }: Props) => {
 														variant="outline"
 														size="icon"
 														onClick={() => {
-															const input = document.querySelector(
-																'input[placeholder*="Enter PR number"]',
+															const input = document.getElementById(
+																"pr-number-input",
 															) as HTMLInputElement;
-															const prNumber = input.value.trim();
+															const prNumber = input?.value.trim();
 															if (prNumber && !field.value?.includes(prNumber)) {
 																field.onChange([...(field.value || []), prNumber]);
 																input.value = "";
