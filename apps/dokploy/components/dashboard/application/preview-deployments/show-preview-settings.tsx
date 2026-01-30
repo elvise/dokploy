@@ -52,6 +52,7 @@ const schema = z
 		port: z.number(),
 		previewLimit: z.number(),
 		previewLabels: z.array(z.string()).optional(),
+		allowedPRNumbers: z.array(z.string()).optional(),
 		previewHttps: z.boolean(),
 		previewPath: z.string(),
 		previewCertificateType: z.enum(["letsencrypt", "none", "custom"]),
@@ -92,6 +93,7 @@ export const ShowPreviewSettings = ({ applicationId }: Props) => {
 			port: 3000,
 			previewLimit: 3,
 			previewLabels: [],
+			allowedPRNumbers: [],
 			previewHttps: false,
 			previewPath: "/",
 			previewCertificateType: "none",
@@ -117,6 +119,7 @@ export const ShowPreviewSettings = ({ applicationId }: Props) => {
 				wildcardDomain: data.previewWildcard || "*.traefik.me",
 				port: data.previewPort || 3000,
 				previewLabels: data.previewLabels || [],
+				allowedPRNumbers: data.allowedPRNumbers || [],
 				previewLimit: data.previewLimit || 3,
 				previewHttps: data.previewHttps || false,
 				previewPath: data.previewPath || "/",
@@ -136,6 +139,7 @@ export const ShowPreviewSettings = ({ applicationId }: Props) => {
 			previewWildcard: formData.wildcardDomain,
 			previewPort: formData.port,
 			previewLabels: formData.previewLabels,
+			allowedPRNumbers: formData.allowedPRNumbers,
 			applicationId,
 			previewLimit: formData.previewLimit,
 			previewHttps: formData.previewHttps,
@@ -297,6 +301,91 @@ export const ShowPreviewSettings = ({ applicationId }: Props) => {
 															const label = input.value.trim();
 															if (label) {
 																field.onChange([...(field.value || []), label]);
+																input.value = "";
+															}
+														}}
+													>
+														<Plus className="size-4" />
+													</Button>
+												</div>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name="allowedPRNumbers"
+										render={({ field }) => (
+											<FormItem className="md:col-span-2">
+												<div className="flex items-center gap-2">
+													<FormLabel>Allowed PR Numbers (Optional)</FormLabel>
+													<TooltipProvider>
+														<Tooltip>
+															<TooltipTrigger asChild>
+																<HelpCircle className="size-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" />
+															</TooltipTrigger>
+															<TooltipContent>
+																<p>
+																	Specify which PR numbers are allowed to
+																	trigger preview deployments. If empty, all
+																	PRs will be allowed (subject to label and
+																	permission filters).
+																</p>
+															</TooltipContent>
+														</Tooltip>
+													</TooltipProvider>
+												</div>
+												<div className="flex flex-wrap gap-2 mb-2">
+													{field.value?.map((prNumber, index) => (
+														<Badge
+															key={index}
+															variant="secondary"
+															className="flex items-center gap-1"
+														>
+															#{prNumber}
+															<X
+																className="size-3 cursor-pointer hover:text-destructive"
+																onClick={() => {
+																	const newPRs = [...(field.value || [])];
+																	newPRs.splice(index, 1);
+																	field.onChange(newPRs);
+																}}
+															/>
+														</Badge>
+													))}
+												</div>
+												<div className="flex gap-2">
+													<FormControl>
+														<Input
+															type="number"
+															placeholder="Enter PR number (e.g. 123)"
+															onKeyDown={(e) => {
+																if (e.key === "Enter") {
+																	e.preventDefault();
+																	const input = e.currentTarget;
+																	const prNumber = input.value.trim();
+																	if (prNumber && !field.value?.includes(prNumber)) {
+																		field.onChange([
+																			...(field.value || []),
+																			prNumber,
+																		]);
+																		input.value = "";
+																	}
+																}
+															}}
+														/>
+													</FormControl>
+													<Button
+														type="button"
+														variant="outline"
+														size="icon"
+														onClick={() => {
+															const input = document.querySelector(
+																'input[placeholder*="Enter PR number"]',
+															) as HTMLInputElement;
+															const prNumber = input.value.trim();
+															if (prNumber && !field.value?.includes(prNumber)) {
+																field.onChange([...(field.value || []), prNumber]);
 																input.value = "";
 															}
 														}}

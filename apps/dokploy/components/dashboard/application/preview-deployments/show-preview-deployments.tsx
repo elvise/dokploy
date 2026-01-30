@@ -141,6 +141,12 @@ export const ShowPreviewDeployments = ({ applicationId }: Props) => {
 															<div className="text-sm text-muted-foreground mt-1">
 																{deployment.branch}
 															</div>
+															{deployment.repository && deployment.owner && (
+																<div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+																	<GithubIcon className="size-3" />
+																	{deployment.owner}/{deployment.repository}
+																</div>
+															)}
 														</div>
 													</div>
 													<Badge variant="outline" className="gap-2">
