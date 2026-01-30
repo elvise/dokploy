@@ -452,6 +452,17 @@ export default async function handler(
 			}
 
 			for (const app of secureApps) {
+				// Check if PR number is in allowed list (if configured)
+				if (app?.allowedPRNumbers && app?.allowedPRNumbers?.length > 0) {
+					const prNumberStr = prNumber.toString();
+					if (!app.allowedPRNumbers.includes(prNumberStr)) {
+						console.log(
+							`Skipping preview deployment for ${app.name}: PR #${prNumber} not in allowed list`,
+						);
+						continue;
+					}
+				}
+
 				// check for labels
 				if (app?.previewLabels && app?.previewLabels?.length > 0) {
 					let hasLabel = false;
@@ -483,6 +494,8 @@ export default async function handler(
 						pullRequestNumber: prNumber,
 						pullRequestTitle: prTitle,
 						pullRequestURL: prURL,
+						repository,
+						owner,
 					});
 					previewDeploymentId = previewDeployment.previewDeploymentId;
 				}

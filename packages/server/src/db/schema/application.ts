@@ -96,6 +96,8 @@ export const applications = pgTable("application", {
 	isPreviewDeploymentsActive: boolean("isPreviewDeploymentsActive").default(
 		false,
 	),
+	// PR Selection: Allow specific PR numbers to trigger preview deployments
+	allowedPRNumbers: text("allowedPRNumbers").array(),
 	// Security: Require collaborator permissions for preview deployments
 	previewRequireCollaboratorPermissions: boolean(
 		"previewRequireCollaboratorPermissions",

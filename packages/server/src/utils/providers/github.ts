@@ -194,6 +194,49 @@ export const getGithubRepositories = async (githubId?: string) => {
 	return repositories;
 };
 
+export const getGithubPullRequests = async (input: {
+	githubId: string;
+	owner: string;
+	repo: string;
+	state?: "open" | "closed" | "all";
+}) => {
+	const { githubId, owner, repo, state = "open" } = input;
+	const githubProvider = await findGithubById(githubId);
+
+	const octokit = new Octokit({
+		authStrategy: createAppAuth,
+		auth: {
+			appId: githubProvider.githubAppId,
+			privateKey: githubProvider.githubPrivateKey,
+			installationId: githubProvider.githubInstallationId,
+		},
+	});
+
+	const pullRequests = (await octokit.paginate(
+		octokit.rest.pulls.list,
+		{
+			owner,
+			repo,
+			state,
+			per_page: 100,
+		},
+	)) as unknown as Awaited<
+		ReturnType<typeof octokit.rest.pulls.list>
+	>["data"];
+
+	return pullRequests.map((pr) => ({
+		number: pr.number,
+		title: pr.title,
+		state: pr.state,
+		url: pr.html_url,
+		branch: pr.head.ref,
+		baseBranch: pr.base.ref,
+		author: pr.user?.login || "unknown",
+		createdAt: pr.created_at,
+		updatedAt: pr.updated_at,
+	}));
+};
+
 export const getGithubBranches = async (
 	input: typeof apiFindGithubBranches._type,
 ) => {

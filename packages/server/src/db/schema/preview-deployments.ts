@@ -20,6 +20,9 @@ export const previewDeployments = pgTable("preview_deployments", {
 	pullRequestURL: text("pullRequestURL").notNull(),
 	pullRequestTitle: text("pullRequestTitle").notNull(),
 	pullRequestCommentId: text("pullRequestCommentId").notNull(),
+	// Repository information for display
+	repository: text("repository"),
+	owner: text("owner"),
 	previewStatus: applicationStatus("previewStatus").notNull().default("idle"),
 	appName: text("appName")
 		.notNull()
@@ -67,8 +70,12 @@ export const apiCreatePreviewDeployment = createSchema
 		pullRequestNumber: true,
 		pullRequestURL: true,
 		pullRequestTitle: true,
+		repository: true,
+		owner: true,
 	})
 	.extend({
 		applicationId: z.string().min(1),
+		repository: z.string().optional(),
+		owner: z.string().optional(),
 		// deploymentId: z.string().min(1),
 	});
